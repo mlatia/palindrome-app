@@ -2,10 +2,10 @@ package com.palindrome.palindromeapp.ui
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.palindrome.palindromeapp.databinding.ActivitySecondScreenBinding
+import com.palindrome.palindromeapp.model.User
 import com.palindrome.palindromeapp.viewmodel.UserViewModel
 import com.palindrome.palindromeapp.viewmodel.ViewModelFactory
 
@@ -13,18 +13,8 @@ class SecondScreenActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySecondScreenBinding
 
-    // Replace viewModels delegate with lazy initialization
     private val viewModel: UserViewModel by lazy {
         ViewModelProvider(this, ViewModelFactory())[UserViewModel::class.java]
-    }
-
-    // Using the deprecated startActivityForResult as per requirement
-    private val userActivityLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            // The selected user is handled by the shared ViewModel
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,6 +26,8 @@ class SecondScreenActivity : AppCompatActivity() {
         setupUI()
         setupObservers()
         setupListeners()
+
+        viewModel.clearSelectedUser()
     }
 
     private fun setupToolbar() {
@@ -49,7 +41,8 @@ class SecondScreenActivity : AppCompatActivity() {
 
     private fun setupUI() {
         val name = intent.getStringExtra(EXTRA_NAME) ?: "User"
-        binding.tvUserName.text = name
+        binding.tvUserName.text = "Welcome, $name"
+        binding.tvSelectedUserLabel.text = "" // Start empty
     }
 
     private fun setupObservers() {
@@ -63,16 +56,17 @@ class SecondScreenActivity : AppCompatActivity() {
     private fun setupListeners() {
         binding.btnChooseUser.setOnClickListener {
             val intent = Intent(this, ThirdScreenActivity::class.java)
-            startActivityForResult(intent, REQUEST_USER) // Using deprecated method as per requirement
+            startActivityForResult(intent, REQUEST_USER)
         }
     }
 
-    // Handle result from ThirdScreenActivity using the deprecated method
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_USER && resultCode == RESULT_OK) {
-            // The selected user is handled by the shared ViewModel
+            data?.getParcelableExtra<User>("selected_user")?.let { selectedUser ->
+                viewModel.selectUser(selectedUser)
+            }
         }
     }
 

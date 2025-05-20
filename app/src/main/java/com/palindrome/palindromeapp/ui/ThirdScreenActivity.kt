@@ -1,5 +1,6 @@
 package com.palindrome.palindromeapp.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -103,8 +104,10 @@ class ThirdScreenActivity : AppCompatActivity() {
     }
 
     private fun onUserSelected(user: User) {
-        viewModel.selectUser(user)
-        setResult(RESULT_OK)
+        val resultIntent = Intent().apply {
+            putExtra("selected_user", user)
+        }
+        setResult(RESULT_OK, resultIntent)
         finish()
     }
 }

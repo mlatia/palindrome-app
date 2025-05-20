@@ -25,8 +25,8 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
     val selectedUser: LiveData<User?> = _selectedUser
 
     private var currentPage = 1
-    private var totalPages = 1
     private var isLastPage = false
+    private var totalPages = 1
 
     init {
         loadUsers(true)
